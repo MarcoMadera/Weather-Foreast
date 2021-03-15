@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getFormattedDate } from "../../lib/utils";
+import { getFormattedDate } from "../lib/utils";
 
 const MiniCard = ({ data, today, selectedCard, setSelectedCard, i }) => {
   const [selected, setSelected] = useState(false);
@@ -9,7 +9,7 @@ const MiniCard = ({ data, today, selectedCard, setSelectedCard, i }) => {
     } else {
       setSelected(false);
     }
-  }, [selectedCard]);
+  }, [selectedCard, i]);
   function handleClick(e) {
     e.preventDefault();
     setSelectedCard(i);
@@ -43,6 +43,11 @@ const MiniCard = ({ data, today, selectedCard, setSelectedCard, i }) => {
         button:focus {
           border: none;
           outline: none;
+        }
+        @media screen and (max-width: 520px) {
+          button {
+            width: 100%;
+          }
         }
       `}</style>
     </button>

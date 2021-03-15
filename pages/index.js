@@ -1,75 +1,71 @@
-import Head from "next/head";
 import { useEffect, useState } from "react";
 import { getFormattedFullDate } from "../lib/utils";
-import Chart from "./components/Chart";
-import DayCards from "./components/DayCards";
-import Input from "./components/Input";
-import MainCard from "./components/MainCard";
+import Chart from "../components/chart";
+import DailyCards from "../components/DailyCards";
+import Input from "../components/Input";
+import MainCard from "../components/MainCard";
+import { unknownWeather } from "../lib/defaultData";
+import Seo from "../components/Seo";
 
 export default function Home() {
   const [search, setSearch] = useState("London");
   const [cityInfo, setCityInfo] = useState({
-    name: "",
-    country: "",
+    name: "London",
+    country: "GB",
     coords: {
       lat: null,
       lon: null,
     },
   });
   const [timeStamps, setTimeStamps] = useState([]);
-  const [weather, setWheater] = useState({});
-  const FORECAST_API = `https://api.openweathermap.org/data/2.5/forecast?q=${search}&units=metric&cnt=24&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
-  const ONECALL_API = `https://api.openweathermap.org/data/2.5/onecall?lat=${cityInfo.coords?.lat}&lon=${cityInfo.coords?.lon}&exclude=minutely,alerts&units=metric&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
   const [data, setData] = useState([]);
   const [labels, setLabels] = useState([]);
   const [selectedCard, setSelectedCard] = useState(0);
+  // currentWeather for use in MainCard when is today selected
+  // const [currentWeather, setCurrentWeather] = useState({});
+  const [dailyWeather, setDailyWeather] = useState([]);
+  const [todayThreeHoursWeather, setTodayThreeHoursWeather] = useState([]);
+  const [error, setError] = useState("");
   useEffect(() => {
-    fetch(FORECAST_API)
+    setError("");
+    fetch(`/api/weather?city=${search}`)
       .then((d) => d.json())
-      .then(({ city, list }) => {
-        setCityInfo({
-          name: city.name,
-          country: city.country,
-          coords: {
-            lat: city.coord.lat,
-            lon: city.coord.lon,
-          },
-        });
-        setTimeStamps(
-          list.map(({ dt_txt, weather, wind, main }) => ({
-            date: dt_txt,
-            weather: weather[0].main,
-            icon: weather[0].icon,
-            temp: main.temp,
-            humidity: main.humidity,
-            windSpeed: wind.speed,
-          }))
-        );
+      .then(({ cityInfo, foreCast }) => {
+        setCityInfo(cityInfo);
+        setTimeStamps(foreCast);
+      })
+      .catch(() => {
+        setError("Not Found");
       });
   }, [search]);
 
   useEffect(() => {
-    if (cityInfo.name) {
-      fetch(ONECALL_API)
+    if (cityInfo.coords?.lat && cityInfo.coords?.lon) {
+      setError("");
+      fetch(
+        `/api/weather?lat=${cityInfo.coords.lat}&lon=${cityInfo.coords.lon}`
+      )
         .then((d) => d.json())
         .then((data) => {
-          setWheater(data);
-          setCityInfo((cityInfo) => ({ ...cityInfo, timeZone: data.timezone }));
+          // setCurrentWeather(data.currentWeather);
+          setDailyWeather(data.dailyWeather);
+          setTodayThreeHoursWeather(data.todayThreeHoursWeather);
+          setCityInfo((cityInfo) => ({ ...cityInfo, ...data.cityInfo }));
+        })
+        .catch(() => {
+          setError("Not Found");
         });
     }
-  }, [cityInfo.name]);
+  }, [cityInfo.coords?.lat, cityInfo.coords?.lon]);
+
   useEffect(() => {
     let temps = [];
     let timelabels = [];
-    if (weather && selectedCard === 0) {
-      weather?.hourly?.forEach(({ temp, dt }, i) => {
-        if (i % 3 === 0 && i <= 24) {
-          temps.push(temp);
-          timelabels.push(getFormattedFullDate(dt * 1000));
-        }
-      });
-      setData(temps);
-      setLabels(timelabels);
+    if (todayThreeHoursWeather && selectedCard === 0) {
+      setData(todayThreeHoursWeather.map(({ temp }) => temp));
+      setLabels(
+        todayThreeHoursWeather.map(({ date }) => getFormattedFullDate(date))
+      );
     } else {
       timeStamps.forEach(({ temp, date }, i) => {
         if (i <= selectedCard * 8 && i >= (selectedCard - 1) * 8) {
@@ -80,29 +76,28 @@ export default function Home() {
       setData(temps);
       setLabels(timelabels);
     }
-  }, [weather, timeStamps, selectedCard]);
+  }, [timeStamps, selectedCard, todayThreeHoursWeather]);
 
   return (
     <div>
       <main>
-        <Head>
-          <title>Weather Forecast</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <Input setSearch={setSearch} />
+        <Seo />
+        <Input
+          cityInfo={cityInfo}
+          setSearch={setSearch}
+          setCityInfo={setCityInfo}
+          error={error}
+        />
         <MainCard
           cityInfo={cityInfo}
-          weather={weather}
-          selectedCard={selectedCard}
+          dailyWeather={dailyWeather[selectedCard] || unknownWeather}
         />
         <Chart data={data} labels={labels} />
-        {weather && (
-          <DayCards
-            weather={weather}
-            setSelectedCard={setSelectedCard}
-            selectedCard={selectedCard}
-          />
-        )}
+        <DailyCards
+          dailyWeather={dailyWeather || unknownWeather}
+          setSelectedCard={setSelectedCard}
+          selectedCard={selectedCard}
+        />
       </main>
       <style jsx>
         {`
@@ -112,22 +107,41 @@ export default function Home() {
             align-items: center;
             padding: 50px 64px;
             width: 100vw;
-            height: 100vh;
+            min-height: 100vh;
           }
           main {
             height: 100%;
             align-items: center;
             justify-content: center;
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
             grid-template-rows: 50px 200px 1fr;
-            grid-template-areas: "input ." "mainCard chart" "mainCard dayCards";
+            grid-template-areas: "input input" "mainCard chart" "mainCard dailyCards";
             padding: 50px 35px;
             width: 100%;
+            max-width: 1440px;
             height: 100%;
             box-shadow: rgb(225, 237, 255) 4px 4px 0 0;
             border-radius: 10px;
             background-color: white;
+          }
+          @media screen and (max-width: 1140px) {
+            main {
+              grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+            }
+          }
+          @media screen and (max-width: 1024px) {
+            main {
+              display: block;
+            }
+            main > :global(*) {
+              margin-bottom: 20px;
+            }
+          }
+          @media screen and (max-width: 524px) {
+            div {
+              padding: 25px 32px;
+            }
           }
         `}
       </style>
