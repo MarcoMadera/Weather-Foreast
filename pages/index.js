@@ -21,8 +21,7 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [labels, setLabels] = useState([]);
   const [selectedCard, setSelectedCard] = useState(0);
-  // currentWeather for use in MainCard when is today selected
-  // const [currentWeather, setCurrentWeather] = useState({});
+  const [currentWeather, setCurrentWeather] = useState({});
   const [dailyWeather, setDailyWeather] = useState([]);
   const [todayThreeHoursWeather, setTodayThreeHoursWeather] = useState([]);
   const [error, setError] = useState("");
@@ -47,7 +46,7 @@ export default function Home() {
       )
         .then((d) => d.json())
         .then((data) => {
-          // setCurrentWeather(data.currentWeather);
+          setCurrentWeather(data.currentWeather);
           setDailyWeather(data.dailyWeather);
           setTodayThreeHoursWeather(data.todayThreeHoursWeather);
           setCityInfo((cityInfo) => ({ ...cityInfo, ...data.cityInfo }));
@@ -89,11 +88,17 @@ export default function Home() {
           error={error}
         />
         <MainCard
+          currentWeather={currentWeather}
           cityInfo={cityInfo}
-          dailyWeather={dailyWeather[selectedCard] || unknownWeather}
+          displayWeather={
+            (selectedCard === 0
+              ? currentWeather
+              : dailyWeather[selectedCard]) || unknownWeather
+          }
         />
         <Chart data={data} labels={labels} />
         <DailyCards
+          currentWeather={currentWeather}
           dailyWeather={dailyWeather || unknownWeather}
           setSelectedCard={setSelectedCard}
           selectedCard={selectedCard}

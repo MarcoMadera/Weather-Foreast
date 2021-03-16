@@ -23,7 +23,7 @@ export default function Input({ cityInfo, setSearch, setCityInfo, error }) {
         <label htmlFor="textInput">Your city</label>
         <input type="text" id="textInput" defaultValue={cityInfo.name} />
       </form>
-      <button onClick={handleClick}>
+      <button onClick={handleClick} aria-label="Find my location">
         <FindMeIcon width={24} height={24} />
       </button>
       {error && <p>{error}</p>}
@@ -54,6 +54,9 @@ export default function Input({ cityInfo, setSearch, setCityInfo, error }) {
           background: none;
           margin-left: 20px;
           cursor: pointer;
+        }
+        button:hover :global(svg) {
+          fill: #5596f6;
         }
         @media screen and (min-width: 1140px) {
           div {

@@ -1,7 +1,7 @@
 import { getFormattedFullDate } from "../lib/utils";
 
-const MainCard = ({ dailyWeather, cityInfo }) => {
-  const { date, icon, temp, weather, humidity, windSpeed } = dailyWeather;
+const MainCard = ({ displayWeather, cityInfo }) => {
+  const { date, icon, temp, weather, humidity, windSpeed } = displayWeather;
   return (
     <div>
       <p className="cityName">

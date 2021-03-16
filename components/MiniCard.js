@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getFormattedDate } from "../lib/utils";
 
-const MiniCard = ({ data, today, selectedCard, setSelectedCard, i }) => {
+const MiniCard = ({ data, selectedCard, setSelectedCard, i }) => {
   const [selected, setSelected] = useState(false);
   useEffect(() => {
     if (selectedCard === i) {
@@ -17,7 +17,7 @@ const MiniCard = ({ data, today, selectedCard, setSelectedCard, i }) => {
   return (
     <button onClick={handleClick}>
       <p>
-        <strong>{today ? "Today" : getFormattedDate(data.date)}</strong>
+        <strong>{i === 0 ? "Today" : getFormattedDate(data.date)}</strong>
       </p>
       <img src={`/icons/${data.icon}.png`} alt="" />
       <p>Humidity</p>
@@ -39,10 +39,6 @@ const MiniCard = ({ data, today, selectedCard, setSelectedCard, i }) => {
         img {
           width: 40px;
           height: auto;
-        }
-        button:focus {
-          border: none;
-          outline: none;
         }
         @media screen and (max-width: 520px) {
           button {
