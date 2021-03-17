@@ -47,7 +47,7 @@ export default function WeatherChart({ data, labels }) {
         }
         div {
           display: block;
-          height: 140px;
+          height: 150px;
           position: relative;
           width: 100%;
         }

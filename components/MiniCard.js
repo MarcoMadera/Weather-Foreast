@@ -40,7 +40,7 @@ const MiniCard = ({ data, selectedCard, setSelectedCard, i }) => {
           width: 40px;
           height: auto;
         }
-        @media screen and (max-width: 520px) {
+        @media screen and (max-width: 575px) {
           button {
             width: 100%;
           }

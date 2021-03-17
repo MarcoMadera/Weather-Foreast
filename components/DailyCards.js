@@ -28,6 +28,7 @@ export default function DailyCards({
           align-items: flex-end;
           flex-wrap: wrap;
           justify-content: space-between;
+          padding: 0 8px;
         }
       `}</style>
     </div>

@@ -21,10 +21,11 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [labels, setLabels] = useState([]);
   const [selectedCard, setSelectedCard] = useState(0);
-  const [currentWeather, setCurrentWeather] = useState({});
+  const [currentWeather, setCurrentWeather] = useState();
   const [dailyWeather, setDailyWeather] = useState([]);
   const [todayThreeHoursWeather, setTodayThreeHoursWeather] = useState([]);
   const [error, setError] = useState("");
+
   useEffect(() => {
     setError("");
     fetch(`/api/weather?city=${search}`)
@@ -86,6 +87,7 @@ export default function Home() {
           setSearch={setSearch}
           setCityInfo={setCityInfo}
           error={error}
+          setError={setError}
         />
         <MainCard
           currentWeather={currentWeather}
@@ -98,7 +100,6 @@ export default function Home() {
         />
         <Chart data={data} labels={labels} />
         <DailyCards
-          currentWeather={currentWeather}
           dailyWeather={dailyWeather || unknownWeather}
           setSelectedCard={setSelectedCard}
           selectedCard={selectedCard}

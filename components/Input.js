@@ -1,21 +1,32 @@
 import FindMeIcon from "./FindMeIcon";
 
-export default function Input({ cityInfo, setSearch, setCityInfo, error }) {
+export default function Input({
+  cityInfo,
+  setSearch,
+  setCityInfo,
+  error,
+  setError,
+}) {
   function handleSubmit(e) {
     e.preventDefault();
     setSearch(e.target[0].value);
   }
   function handleClick(e) {
     e.preventDefault();
-    navigator.geolocation.getCurrentPosition((location) => {
-      setCityInfo((cityInfo) => ({
-        ...cityInfo,
-        coords: {
-          lat: location.coords.latitude,
-          lon: location.coords.longitude,
-        },
-      }));
-    });
+    navigator.geolocation.getCurrentPosition(
+      (location) => {
+        setCityInfo((cityInfo) => ({
+          ...cityInfo,
+          coords: {
+            lat: location.coords.latitude,
+            lon: location.coords.longitude,
+          },
+        }));
+      },
+      () => {
+        setError("Your location could not be determined");
+      }
+    );
   }
   return (
     <div>

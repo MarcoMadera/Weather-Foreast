@@ -24,6 +24,13 @@ export const config = {
     legend: {
       display: false,
     },
+    layout: {
+      padding: {
+        top: 8,
+        bottom: 8,
+        right: 8,
+      },
+    },
     elements: {
       point: {
         radius: 0,
