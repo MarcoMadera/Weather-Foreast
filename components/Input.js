@@ -30,15 +30,21 @@ export default function Input({
   }
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="textInput">Your city</label>
-        <input type="text" id="textInput" defaultValue={cityInfo.name} />
-      </form>
-      <button onClick={handleClick} aria-label="Find my location">
-        <FindMeIcon width={24} height={24} />
-      </button>
+      <section>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="textInput">Your city</label>
+          <input type="text" id="textInput" defaultValue={cityInfo.name} />
+        </form>
+        <button onClick={handleClick} aria-label="Find my location">
+          <FindMeIcon width={24} height={24} />
+        </button>
+      </section>
       {error && <p>{error}</p>}
       <style jsx>{`
+        section {
+          display: flex;
+          align-items: center;
+        }
         div {
           display: flex;
           align-items: center;
@@ -73,6 +79,11 @@ export default function Input({
           div {
             justify-content: start;
             margin-left: 20px;
+          }
+        }
+        @media screen and (max-width: 640px) {
+          div {
+            flex-direction: column;
           }
         }
         @media screen and (max-width: 500px) {
