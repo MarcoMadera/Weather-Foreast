@@ -21,6 +21,7 @@ module.exports = {
   plugins: ["react", "jsx-a11y", "react-hooks", "prettier"],
   rules: {
     "react/prop-types": 0,
+    "react/no-unknown-property": 0,
     "prettier/prettier": ["error", { endOfLine: "auto" }],
     "jsx-a11y/anchor-is-valid": [
       0,
